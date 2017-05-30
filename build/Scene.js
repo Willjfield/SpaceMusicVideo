@@ -52,7 +52,7 @@ function onLoad() {
 
   // Create 3D objects.
   
-  var geometry = new THREE.PlaneGeometry( 100, 100, planeResolution, planeResolution*2 );
+  var geometry = new THREE.PlaneGeometry( 100, 200, planeResolution, planeResolution*2 );
   var vertex = document.getElementById('vertexShader').innerHTML;
   var fragment = document.getElementById('fragmentShader').innerHTML;
   console.log(fragment)
@@ -140,7 +140,7 @@ function onLoad() {
   });
   setupStage();
   loadAudio();
-  loadModels(4);
+  loadModels();
 }
 
 function onTextureLoaded(texture) {
@@ -162,7 +162,7 @@ function animate(timestamp) {
   uniforms.u_time.value += .01;
   plane.geometry.verticesNeedUpdate = true;
   skyMesh.material.needsUpdate = true; 
-  if(frameNum%5 === 0){
+  if(frameNum%3 === 0){
     for(var v = 0; v<planeResolution+1; v++){
       for(var i = planeResolution*2;i>0;i--){
         plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
@@ -272,10 +272,73 @@ var onError = function ( xhr ) {
            
 var loader = new THREE.OBJLoader( manager );
 
-function loadModels(numModels){
-  for (var i =0; i<numModels;i++){ 
+var models = {
+  astronaut: {
+    name: 'astronaut',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  EMU: {
+    name: 'EMU',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  STS: {
+    name: 'STS',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  ISS: {
+    name: 'ISS',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  Hubble: {
+    name: 'Hubble',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  LRO: {
+    name: 'LRO',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  LEM: {
+    name: 'LEM',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  Dawn: {
+    name: 'Dawn',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  MGS_mapping: {
+    name: 'MGS_mapping',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  MESSENGER: {
+    name: 'MESSENGER',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  Rosetta: {
+    name: 'Rosetta',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  galileo: {
+    name: 'galileo',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  Titan_Sub: {
+    name: 'Titan_Sub',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  Cassini: {
+    name: 'Cassini',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+  voyager: {
+    name: 'voyager',
+    scale: new THREE.Vector3( 1, 1, 1 )
+  },
+}
+
+function loadModels(){
+  for (var i in models){ 
       (function(index){
-          loader.load( './assets/space_obj/' + index + '.obj', function ( object ) { 
+          loader.load( './assets/space_obj/' + models[index].name + '.obj', function ( object ) { 
               //object.name=load_obj; 
               object.traverse( function ( child ) {
                 if ( child instanceof THREE.Mesh ) {
@@ -286,7 +349,7 @@ function loadModels(numModels){
               object.scale.set( .1, .1, .1 );
               object.position.z-=200;  
               object.visible= false;  
-              assets.push(object);     
+              models[index].model = object;    
           }, onProgress, onError ); 
       })(i);
   }
@@ -294,19 +357,19 @@ function loadModels(numModels){
 
 function playAssets(){
   setTimeout(function(){
-    animateModel(assets[1]);
+    animateModel(models.astronaut.model);
   },2000);
 
   setTimeout(function(){
-    animateModel(assets[2]);
+    animateModel(models.ISS.model);
   },10000);
 
   setTimeout(function(){
-    animateModel(assets[0]);
+    animateModel(models.LRO.model);
   },18000);
 
   setTimeout(function(){
-    animateModel(assets[3]);
+    animateModel(models.Cassini.model);
   },26000);
 }
 function animateModel(_model){
