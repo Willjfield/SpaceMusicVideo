@@ -11,14 +11,20 @@
   },
   "devDependencies": {
     "browserify": "latest",
+    "connect": "^3.6.2",
     "derequire": "latest",
+    "express": "^4.15.3",
+    "http-server": "^0.10.0",
+    "serve-static": "^1.12.3",
     "watchify": "latest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/googlevr/webvr-boilerplate.git"
   },
-  "keywords": ["vr"],
+  "keywords": [
+    "vr"
+  ],
   "author": "Boris Smus <boris@smus.com>",
   "license": "Apache-2.0",
   "bugs": {
