@@ -226,9 +226,9 @@ function setupStage() {
 window.addEventListener('load', onLoad);
 
 function initDesktop(){
-  controls = new THREE.OrbitControls( camera, renderer.domElement );
-  controls.enableZoom = false;
-  controls.target.y = camera.position.y;
+  // controls = new THREE.OrbitControls( camera, renderer.domElement );
+  // controls.enableZoom = false;
+  // controls.target.y = camera.position.y;
 }
 
 var analyser;
@@ -275,15 +275,15 @@ var loader = new THREE.OBJLoader( manager );
 var models = {
   astronaut: {
     name: 'astronaut',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( 3, 3, 3 )
   },
   EMU: {
     name: 'EMU',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( 3, 3, 3 )
   },
   STS: {
     name: 'STS',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( 2, 2, 2 )
   },
   ISS: {
     name: 'ISS',
@@ -291,7 +291,7 @@ var models = {
   },
   Hubble: {
     name: 'Hubble',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .05, .05, .05 )
   },
   LRO: {
     name: 'LRO',
@@ -327,11 +327,11 @@ var models = {
   },
   Cassini: {
     name: 'Cassini',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3(.05, .05, .05)
   },
   voyager: {
     name: 'voyager',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .05, .05, .05 )
   },
 }
 
@@ -357,22 +357,69 @@ function loadModels(){
 
 function playAssets(){
   setTimeout(function(){
-    animateModel(models.astronaut.model);
-  },2000);
+    animateModel('astronaut');
+  },100);
 
   setTimeout(function(){
-    animateModel(models.ISS.model);
+    animateModel('EMU');
   },10000);
 
   setTimeout(function(){
-    animateModel(models.LRO.model);
-  },18000);
+    animateModel('STS');
+  },20000);
 
   setTimeout(function(){
-    animateModel(models.Cassini.model);
-  },26000);
+    animateModel('ISS');
+  },30000);
+
+  setTimeout(function(){
+    animateModel('Hubble');
+  },40000);
+
+  setTimeout(function(){
+    animateModel('LRO');
+  },50000);
+
+  setTimeout(function(){
+    animateModel('LEM');
+  },60000);
+
+  setTimeout(function(){
+    animateModel('Dawn');
+  },70000);
+
+  setTimeout(function(){
+    animateModel('MGS_mapping');
+  },80000);
+
+  setTimeout(function(){
+    animateModel('MESSENGER');
+  },90000);
+
+  setTimeout(function(){
+    animateModel('Rosetta');
+  },100000);
+
+  setTimeout(function(){
+    animateModel('galileo');
+  },110000);
+
+  setTimeout(function(){
+    animateModel('Cassini');
+  },120000);
+
+  setTimeout(function(){
+    animateModel('Titan_Sub');
+  },130000);
+
+  setTimeout(function(){
+    animateModel('voyager');
+  },140000);
 }
-function animateModel(_model){
+function animateModel(modelName){
+  var _model = models[modelName].model;
+  var targetScale = models[modelName].scale;
+
   _model.visible = true;
   _model.position.set( 0, 0, -200 );
   _model.rotation.set( 0, 0, 0 );
@@ -394,9 +441,9 @@ function animateModel(_model){
       ease:Linear.easeNone
   });
   TweenLite.to(_model.scale, 30, { 
-      z: .2,
-      y: .2,
-      x: .2,
+      z: targetScale.z,
+      y: targetScale.y,
+      x: targetScale.x,
       ease:Linear.easeNone
   });
 }
