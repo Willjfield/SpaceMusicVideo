@@ -1,4 +1,5 @@
 var express = require('express');
 var app = express();
+const port = 9090;
 app.use('/', express.static(__dirname)); // ← adjust
-app.listen(9090, function() { console.log('listening'); });
+app.listen(port, function() { console.log('listening on port: '+port); });

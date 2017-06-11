@@ -75,8 +75,37 @@ function onLoad() {
   skyMesh = new THREE.Mesh( skyGeometry, skyMaterial);
   scene.add(skyMesh);
 
-  material = new THREE.MeshBasicMaterial( {color: new THREE.Color( 0xff0088 ), wireframe:true} );
+  material = new THREE.MeshBasicMaterial( {color: new THREE.Color( 0xff0088 ), wireframe:true, transparent: true} );
+  var planeWireGeo = new THREE.WireframeGeometry( geometry );
+  var planeWireMat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 1 } );
+
+  var normal = new THREE.Vector3( 0, 1, 0 ); //optional
+  var color = new THREE.Color( 0xffaa00 ); //optional
+  var materialIndex = 0; //optional
+  var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
+
+  //add the face to the geometry's faces array
+  // geometry.faces.push( face );
+  //   geometry.faces.push( face );
+  //     geometry.faces.push( face );
+  //       geometry.faces.push( face );
+  //         geometry.faces.push( face );
+  //           geometry.faces.push( face );
+  //             geometry.faces.push( face );
+  // //the face normals and vertex normals can be calculated automatically if not supplied above
+  // geometry.computeFaceNormals();
+  // geometry.computeVertexNormals();
   plane = new THREE.Mesh( geometry, material );
+ //   var normal = new THREE.Vector3( 0, 1, 0 ); //optional
+ //  var color = new THREE.Color( 0xffaa00 ); //optional
+ //  var materialIndex = 0; //optional
+ //  var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
+ // plane.geometry.faces.push( face );
+  //add the face to the geometry's faces array
+  // for(var c=0;c<plane.geometry.faces.length;c++){
+  //   plane.geometry.faces.push( face );
+  // }
+  //plane = new THREE.LineSegments( planeWireGeo, planeWireMat );
   plane.rotation.x = -Math.PI/2;
   plane.position.set(0, -20, -25);
 
@@ -161,6 +190,8 @@ function animate(timestamp) {
 
   uniforms.u_time.value += .01;
   plane.geometry.verticesNeedUpdate = true;
+  plane.geometry.colorsNeedUpdate = true;
+  
   skyMesh.material.needsUpdate = true; 
   if(frameNum%3 === 0){
     for(var v = 0; v<planeResolution+1; v++){
@@ -170,6 +201,7 @@ function animate(timestamp) {
       plane.geometry.vertices[v].z = 0;
       plane.geometry.vertices[v].z=Math.pow(analyser.getFrequencyData()[v]*.01,3);
       plane.geometry.vertices[planeResolution-v].z+=Math.pow(analyser.getFrequencyData()[v]*.01,3);
+      //plane.geometry.colors[v] = new THREE.Color(  );
     }
   }
 
