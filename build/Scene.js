@@ -52,7 +52,7 @@ function onLoad() {
 
   // Create 3D objects.
   
-  var geometry = new THREE.PlaneGeometry( 100, 200, planeResolution, planeResolution*2 );
+  //var geometry = new THREE.PlaneGeometry( 100, 200, planeResolution, planeResolution*2 );
   var vertex = document.getElementById('vertexShader').innerHTML;
   var fragment = document.getElementById('fragmentShader').innerHTML;
   console.log(fragment)
@@ -71,45 +71,9 @@ function onLoad() {
   skyMaterial.needsUpdate = true;
   var skyGeometry = new THREE.IcosahedronBufferGeometry(1000, 3)
   skyGeometry.phiLength = Math.PI/2;
-  //THREE.SphereGeometry( radius, segmentsWidth, segmentsHeight, phiStart, phiLength, thetaStart, thetaLength );
   skyMesh = new THREE.Mesh( skyGeometry, skyMaterial);
   scene.add(skyMesh);
 
-  material = new THREE.MeshBasicMaterial( {color: new THREE.Color( 0xff0088 ), wireframe:true, transparent: true} );
-  var planeWireGeo = new THREE.WireframeGeometry( geometry );
-  var planeWireMat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 1 } );
-
-  var normal = new THREE.Vector3( 0, 1, 0 ); //optional
-  var color = new THREE.Color( 0xffaa00 ); //optional
-  var materialIndex = 0; //optional
-  var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
-
-  //add the face to the geometry's faces array
-  // geometry.faces.push( face );
-  //   geometry.faces.push( face );
-  //     geometry.faces.push( face );
-  //       geometry.faces.push( face );
-  //         geometry.faces.push( face );
-  //           geometry.faces.push( face );
-  //             geometry.faces.push( face );
-  // //the face normals and vertex normals can be calculated automatically if not supplied above
-  // geometry.computeFaceNormals();
-  // geometry.computeVertexNormals();
-  plane = new THREE.Mesh( geometry, material );
- //   var normal = new THREE.Vector3( 0, 1, 0 ); //optional
- //  var color = new THREE.Color( 0xffaa00 ); //optional
- //  var materialIndex = 0; //optional
- //  var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
- // plane.geometry.faces.push( face );
-  //add the face to the geometry's faces array
-  // for(var c=0;c<plane.geometry.faces.length;c++){
-  //   plane.geometry.faces.push( face );
-  // }
-  //plane = new THREE.LineSegments( planeWireGeo, planeWireMat );
-  plane.rotation.x = -Math.PI/2;
-  plane.position.set(0, -20, -25);
-
-  scene.add(plane);
 
   window.addEventListener('resize', onResize, true);
   window.addEventListener('vrdisplaypresentchange', onResize, true);
@@ -170,6 +134,9 @@ function onLoad() {
   setupStage();
   loadAudio();
   loadModels();
+
+  var floorGroup = buildFloor();
+  scene.add(floorGroup);
 }
 
 function onTextureLoaded(texture) {
@@ -189,21 +156,21 @@ function animate(timestamp) {
   frameNum++;
 
   uniforms.u_time.value += .01;
-  plane.geometry.verticesNeedUpdate = true;
-  plane.geometry.colorsNeedUpdate = true;
+  // plane.geometry.verticesNeedUpdate = true;
+  // plane.geometry.colorsNeedUpdate = true;
   
   skyMesh.material.needsUpdate = true; 
-  if(frameNum%3 === 0){
-    for(var v = 0; v<planeResolution+1; v++){
-      for(var i = planeResolution*2;i>0;i--){
-        plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
-      }
-      plane.geometry.vertices[v].z = 0;
-      plane.geometry.vertices[v].z=Math.pow(analyser.getFrequencyData()[v]*.01,3);
-      plane.geometry.vertices[planeResolution-v].z+=Math.pow(analyser.getFrequencyData()[v]*.01,3);
-      //plane.geometry.colors[v] = new THREE.Color(  );
-    }
-  }
+  // if(frameNum%3 === 0){
+  //   for(var v = 0; v<planeResolution+1; v++){
+  //     for(var i = planeResolution*2;i>0;i--){
+  //       plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
+  //     }
+  //     plane.geometry.vertices[v].z = 0;
+  //     plane.geometry.vertices[v].z=Math.pow(analyser.getFrequencyData()[v]*.01,3);
+  //     plane.geometry.vertices[planeResolution-v].z+=Math.pow(analyser.getFrequencyData()[v]*.01,3);
+  //   }
+  // }
+  animateFloor();
 
   var delta = Math.min(timestamp - lastRenderTime, 500);
   lastRenderTime = timestamp;
@@ -478,4 +445,187 @@ function animateModel(modelName){
       x: targetScale.x,
       ease:Linear.easeNone
   });
+}
+
+  var particlesData = [];
+  var maxParticleCount = 1000;
+  var particleCount = 1000;
+  var r = 800;
+  var rHalf = r / 2;
+  var group = new THREE.Group();
+    var effectController = {
+    showDots: true,
+    showLines: true,
+    minDistance: 11,
+    limitConnections: false,
+    maxConnections: 200,
+    particleCount: 50
+  };
+  var linesMesh;
+  var pMaterial;
+  var colors, positions;
+  var particles;
+
+function buildFloor(){
+
+  var segments = maxParticleCount * maxParticleCount;
+
+  positions = new Float32Array( segments * 3 );
+  colors = new Float32Array( segments * 3 );
+
+ pMaterial = new THREE.PointsMaterial( {
+    color: 0xff0088,
+    size: 2,
+   blending: THREE.AdditiveBlending,
+    transparent: true,
+    sizeAttenuation: false
+  } );
+
+  particles = new THREE.BufferGeometry();
+  particlePositions = new Float32Array( maxParticleCount * 3 );
+
+  for ( var i = 0; i < maxParticleCount; i++ ) {
+
+    var x = ((i%planeResolution)*10)-(planeResolution/2)*10;
+    var y = -20;
+    var z = (Math.floor(i/planeResolution)*10)-(planeResolution*2)*10;
+
+    //z-= planeResolution/2;
+    //x-= planeResolution/2;
+
+    particlePositions[ i * 3     ] = x;
+    particlePositions[ i * 3 + 1 ] = y;
+    particlePositions[ i * 3 + 2 ] = z;
+
+    // add it to the geometry
+    particlesData.push( {
+      velocity: new THREE.Vector3( -1 + Math.random() * 2, -1 + Math.random() * 2,  -1 + Math.random() * 2 ),
+      numConnections: 0
+    } );
+
+  }
+
+  particles.setDrawRange( 0, particleCount );
+  particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
+
+  // create the particle system
+  pointCloud = new THREE.Points( particles, pMaterial );
+  group.add( pointCloud );
+
+  var geometry = new THREE.BufferGeometry();
+
+  geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setDynamic( true ) );
+  geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
+
+  geometry.computeBoundingSphere();
+
+  //geometry.setDrawRange( 0, 0 );
+
+  var material = new THREE.LineBasicMaterial( {
+    vertexColors: THREE.VertexColors,
+    color:0xff0088,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+  } );
+
+  linesMesh = new THREE.Line( geometry, material );
+  linesMesh.frustumCulled = false;
+  group.add( linesMesh );
+
+  return group;
+}
+
+function animateFloor(){
+  var vertexpos = 0;
+  var colorpos = 0;
+  var numConnected = 0;
+
+  for ( var i = 0; i < particleCount; i++ )
+    particlesData[ i ].numConnections = 0;
+
+  for ( var i = 0; i < particleCount; i++ ) {
+
+    // get the particle
+    var particleData = particlesData[i];
+
+    var x_index = i*3;
+    var y_index = i*3+1;
+    var z_index = i*3+2;
+
+    //particlePositions[ i * 3     ] += particleData.velocity.x;
+    //particlePositions[ i * 3 + 1 ] += particleData.velocity.y;
+    //particlePositions[ i * 3 + 2 ] += particleData.velocity.z;
+
+    // if ( particlePositions[ i * 3 + 1 ] < -rHalf || particlePositions[ i * 3 + 1 ] > rHalf )
+    //   particleData.velocity.y = -particleData.velocity.y;
+
+  
+    // if ( particlePositions[ i * 3 ] < -rHalf || particlePositions[ i * 3 ] > rHalf )
+    //   particleData.velocity.x = -particleData.velocity.x;
+
+    // if ( particlePositions[ i * 3 + 2 ] < -rHalf || particlePositions[ i * 3 + 2 ] > rHalf )
+    //   particleData.velocity.z = -particleData.velocity.z;
+
+     //for(var v = 0; v<planeResolution+1; v++){
+          //plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
+
+      // for(var j = planeResolution*2;i>0;i--){
+      //   plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
+      // }
+  //     plane.geometry.vertices[v].z = 0;
+  //     plane.geometry.vertices[v].z=Math.pow(analyser.getFrequencyData()[v]*.01,3);
+  //     plane.geometry.vertices[planeResolution-v].z+=Math.pow(analyser.getFrequencyData()[v]*.01,3);
+  //   }
+    //}
+    //console.log(analyser.getFrequencyData().length)
+    //particlePositions[i*3+1] =  -20+(analyser.getFrequencyData()[i%planeResolution]*.01);
+    if ( effectController.limitConnections && particleData.numConnections >= effectController.maxConnections )
+      continue;
+
+    // Check collision
+    for ( var j = i + 1; j < particleCount; j++ ) {
+
+      var particleDataB = particlesData[ j ];
+      if ( effectController.limitConnections && particleDataB.numConnections >= effectController.maxConnections )
+        continue;
+
+      var dx = particlePositions[ i * 3     ] - particlePositions[ j * 3     ];
+      var dy = particlePositions[ i * 3 + 1 ] - particlePositions[ j * 3 + 1 ];
+      var dz = particlePositions[ i * 3 + 2 ] - particlePositions[ j * 3 + 2 ];
+      var dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
+
+      if ( dist < effectController.minDistance ) {
+
+        particleData.numConnections++;
+        particleDataB.numConnections++;
+
+        var alpha = 1.0 - dist / effectController.minDistance;
+
+        positions[ vertexpos++ ] = particlePositions[ i * 3     ];
+        positions[ vertexpos++ ] = particlePositions[ i * 3 + 1 ];
+        positions[ vertexpos++ ] = particlePositions[ i * 3 + 2 ];
+
+        positions[ vertexpos++ ] = particlePositions[ j * 3     ];
+        positions[ vertexpos++ ] = particlePositions[ j * 3 + 1 ];
+        positions[ vertexpos++ ] = particlePositions[ j * 3 + 2 ];
+
+        colors[ colorpos++ ] = alpha;
+        colors[ colorpos++ ] = alpha;
+        colors[ colorpos++ ] = alpha;
+
+        colors[ colorpos++ ] = alpha;
+        colors[ colorpos++ ] = alpha;
+        colors[ colorpos++ ] = alpha;
+
+        numConnected++;
+      }
+    }
+  }
+
+
+  linesMesh.geometry.setDrawRange( 0, numConnected * 2 );
+ linesMesh.geometry.attributes.position.needsUpdate = true;
+  linesMesh.geometry.attributes.color.needsUpdate = true;
+
+  group.children[0].geometry.attributes.position.needsUpdate = true;
 }
