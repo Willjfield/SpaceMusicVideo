@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Web VR boilerplate</title>
+<title>The City and Horses – Space</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -47,10 +47,13 @@ a#magic-window {
 <script id="fragmentShader" type="x-shader/x-fragment">
   varying vec2 vUv;
   varying vec3 vPosition;
+  uniform vec3 u_tint;
+  uniform float u_atmosphere;
   void main() {
       float horizonGradientPos = (1.-vUv.y)-.25;
-      vec3 tint = vec3(.4,.3,.7);
-      gl_FragColor = vec4(vec3(horizonGradientPos)*tint, 1.0);
+      horizonGradientPos += u_atmosphere;
+      //vec3 tint = vec3(.4,.3,.7);
+      gl_FragColor = vec4(vec3(horizonGradientPos)*u_tint, 1.0);
   }
 </script>
 <script id="vertexShader" type="x-shader/x-vertex">

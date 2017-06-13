@@ -21,6 +21,12 @@ var renderer;
 var sound;
 var startedSoundTime = 0;
 var skyMesh;
+
+var floorControls = {
+  bendX: 0,
+  bendY: 0
+}
+
 function onLoad() {
 
   // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
@@ -52,14 +58,15 @@ function onLoad() {
 
   // Create 3D objects.
   
-  //var geometry = new THREE.PlaneGeometry( 100, 200, planeResolution, planeResolution*2 );
   var vertex = document.getElementById('vertexShader').innerHTML;
   var fragment = document.getElementById('fragmentShader').innerHTML;
   console.log(fragment)
    uniforms = {
         u_time: { type: "f", value: 1.0 },
         u_resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth,window.innerHeight) },
-        u_mouse: { type: "v2", value: new THREE.Vector2() }
+        u_mouse: { type: "v2", value: new THREE.Vector2() },
+        u_tint: {type: "v3", value: new THREE.Vector3(.2,.3,.9)},
+        u_atmosphere: { type: "f", value: 1.0 }, 
     };
   var skyMaterial = //new THREE.MeshBasicMaterial( {color: new THREE.Color( 0x8800ff ),side:THREE.DoubleSide} );
   new THREE.ShaderMaterial({
@@ -95,13 +102,6 @@ function onLoad() {
   });
   vrButton.on('show', function() {
     document.getElementById('ui').style.display = 'inherit';
-    //initDaydream();
-    
-    // if(!sound.isPlaying){
-    //   sound.play();
-    //   startedSoundTime = sound.context.currentTime;
-    // }
-    
   });
   document.getElementById('vr-button').appendChild(vrButton.domElement);
   document.getElementById('vr-button').addEventListener('click', function(){
@@ -160,16 +160,6 @@ function animate(timestamp) {
   // plane.geometry.colorsNeedUpdate = true;
   
   skyMesh.material.needsUpdate = true; 
-  // if(frameNum%3 === 0){
-  //   for(var v = 0; v<planeResolution+1; v++){
-  //     for(var i = planeResolution*2;i>0;i--){
-  //       plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
-  //     }
-  //     plane.geometry.vertices[v].z = 0;
-  //     plane.geometry.vertices[v].z=Math.pow(analyser.getFrequencyData()[v]*.01,3);
-  //     plane.geometry.vertices[planeResolution-v].z+=Math.pow(analyser.getFrequencyData()[v]*.01,3);
-  //   }
-  // }
   animateFloor();
 
   var delta = Math.min(timestamp - lastRenderTime, 500);
@@ -355,7 +345,21 @@ function loadModels(){
 };
 
 function playAssets(){
-  var interval=1500;
+  // if( uniforms.u_atmosphere.value>0){
+  //   uniforms.u_atmosphere.value -= .01;
+  // }
+
+  TweenLite.to(uniforms.u_atmosphere, 60, { 
+        value: -.8,
+    });
+
+  TweenLite.to(uniforms.u_tint.value, 30,{
+    x:.4,
+    y:.3,
+    z:.7
+  });
+
+  var interval=1750;
   var time = 1000;
   setTimeout(function(){
     animateModel('astronaut');
@@ -444,6 +448,20 @@ function playAssets(){
   setTimeout(function(){
     animateModel('voyager');
   },time);
+
+  setTimeout(function(){
+    TweenLite.to(floorControls, 3, { 
+        bendX: 1,
+        bendY: 1
+    });
+  },53000);
+
+  setTimeout(function(){
+    for(var p in particlesData){
+      particlesData[p].velocity = new THREE.Vector3( -.5 + Math.random(), -.5 + Math.random(),  -.5 + Math.random() )
+    }
+  }, 89000)
+  
 }
 function animateModel(modelName){
   console.log('animating '+modelName)
@@ -451,7 +469,7 @@ function animateModel(modelName){
   var targetScale = models[modelName].scale;
 
   _model.visible = true;
-  _model.position.set( 0, 0, -200 );
+  _model.position.set( 10*((Math.round(Math.random())*2)-1), 10*((Math.round(Math.random())*2)), -200 );
   _model.rotation.set( 0, 0, 0 );
   _model.scale.set( 0, 0, 0 );
   TweenLite.to(_model.position, 30, { 
@@ -521,19 +539,16 @@ function buildFloor(){
     var y = -30;
     var z = (Math.floor(i/planeResolution)*10)-(planeResolution*4)*10;
 
-    //var z = planeResolution/2;
-    //x-= planeResolution/2;
-
     particlePositions[ i * 3     ] = x;
     particlePositions[ i * 3 + 1 ] = y;
     particlePositions[ i * 3 + 2 ] = z;
 
     // add it to the geometry
     particlesData.push( {
-      velocity: new THREE.Vector3( -1 + Math.random() * 2, -1 + Math.random() * 2,  -1 + Math.random() * 2 ),
+      //velocity: new THREE.Vector3( -1 + Math.random() * 2, -1 + Math.random() * 2,  -1 + Math.random() * 2 ),
+      velocity: new THREE.Vector3( 0, 0, 0 ),
       numConnections: 0
     } );
-
   }
 
   particles.setDrawRange( 0, particleCount );
@@ -587,20 +602,29 @@ function animateFloor(){
 
     particlePositions[z_index]+=floorForward
     if(i<planeResolution){
-      
-       //particlePositions[y_index] += Math.pow(Math.sin(i%planeResolution/4),2)*10;
-       particlePositions[y_index] = Math.sin(i%planeResolution/2)*planeResolution
-       particlePositions[x_index] = Math.cos(i%planeResolution/2)*planeResolution
-       particlePositions[y_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05);
+      var planePosition_x = ((i%planeResolution)*10)-(planeResolution/2)*10;
+      var planePosition_y = -30;
+      particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution*4)*10;
+
+      var tubePosition_y = Math.sin(i%planeResolution/2)*planeResolution
+      var tubePosition_x = Math.cos(i%planeResolution/2)*planeResolution
+
+      particlePositions[y_index] = lerp(planePosition_y,tubePosition_y,floorControls.bendY);
+      particlePositions[x_index] = lerp(planePosition_x,tubePosition_x,floorControls.bendX);
+
+      particlePositions[y_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05);
       particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);
+
+      particlePositions[z_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05)*floorControls.bendX;
+      particlePositions[z_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05)*floorControls.bendX;
+
       particlePositions[y_index] -=10
-       //particlePositions[y_index] += (i%(planeResolution));
     }
 
     
-    //particlePositions[ i * 3     ] += particleData.velocity.x;
-    //particlePositions[ i * 3 + 1 ] += particleData.velocity.y;
-    //particlePositions[ i * 3 + 2 ] += particleData.velocity.z;
+    particlePositions[ i * 3     ] += particleData.velocity.x;
+    particlePositions[ i * 3 + 1 ] += particleData.velocity.y;
+    particlePositions[ i * 3 + 2 ] += particleData.velocity.z;
 
     if ( effectController.limitConnections && particleData.numConnections >= effectController.maxConnections )
       continue;
@@ -654,4 +678,9 @@ function animateFloor(){
   linesMesh.geometry.attributes.color.needsUpdate = true;
 
   group.children[0].geometry.attributes.position.needsUpdate = true;
+}
+
+function lerp(start, end, percent)
+{
+     return (start + percent*(end - start));
 }
