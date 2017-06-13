@@ -60,7 +60,7 @@ function onLoad() {
   
   var vertex = document.getElementById('vertexShader').innerHTML;
   var fragment = document.getElementById('fragmentShader').innerHTML;
-  console.log(fragment)
+  //console.log(fragment)
    uniforms = {
         u_time: { type: "f", value: 1.0 },
         u_resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth,window.innerHeight) },
@@ -498,7 +498,7 @@ function animateModel(modelName){
 
   var particlesData = [];
   var maxParticleCount = 1000;
-  var particleCount = 1000;
+  var particleCount = 500;
   var r = 800;
   var rHalf = r / 2;
   var group = new THREE.Group();
@@ -537,7 +537,7 @@ function buildFloor(){
 
     var x = ((i%planeResolution)*10)-(planeResolution/2)*10;
     var y = -30;
-    var z = (Math.floor(i/planeResolution)*10)-(planeResolution*4)*10;
+    var z = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
 
     particlePositions[ i * 3     ] = x;
     particlePositions[ i * 3 + 1 ] = y;
@@ -604,7 +604,7 @@ function animateFloor(){
     if(i<planeResolution){
       var planePosition_x = ((i%planeResolution)*10)-(planeResolution/2)*10;
       var planePosition_y = -30;
-      particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution*4)*10;
+      particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
 
       var tubePosition_y = Math.sin(i%planeResolution/2)*planeResolution
       var tubePosition_x = Math.cos(i%planeResolution/2)*planeResolution
