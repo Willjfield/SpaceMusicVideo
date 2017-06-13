@@ -449,7 +449,7 @@ function animateModel(modelName){
 
   var particlesData = [];
   var maxParticleCount = 1000;
-  var particleCount = 1000;
+  var particleCount = 500;
   var r = 800;
   var rHalf = r / 2;
   var group = new THREE.Group();
@@ -487,7 +487,7 @@ function buildFloor(){
   for ( var i = 0; i < maxParticleCount; i++ ) {
 
     var x = ((i%planeResolution)*10)-(planeResolution/2)*10;
-    var y = -20;
+    var y = -30;
     var z = (Math.floor(i/planeResolution)*10)-(planeResolution*2)*10;
 
     //z-= planeResolution/2;
@@ -552,33 +552,18 @@ function animateFloor(){
     var y_index = i*3+1;
     var z_index = i*3+2;
 
+    if(i<planeResolution){
+      particlePositions[y_index] = -40+(analyser.getFrequencyData()[(i%planeResolution)]*.05);
+      particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);
+       particlePositions[y_index] += Math.pow(Math.sin(i%planeResolution/4),2)*10;
+       //particlePositions[y_index] += (i%(planeResolution));
+    }
+
+    
     //particlePositions[ i * 3     ] += particleData.velocity.x;
     //particlePositions[ i * 3 + 1 ] += particleData.velocity.y;
     //particlePositions[ i * 3 + 2 ] += particleData.velocity.z;
 
-    // if ( particlePositions[ i * 3 + 1 ] < -rHalf || particlePositions[ i * 3 + 1 ] > rHalf )
-    //   particleData.velocity.y = -particleData.velocity.y;
-
-  
-    // if ( particlePositions[ i * 3 ] < -rHalf || particlePositions[ i * 3 ] > rHalf )
-    //   particleData.velocity.x = -particleData.velocity.x;
-
-    // if ( particlePositions[ i * 3 + 2 ] < -rHalf || particlePositions[ i * 3 + 2 ] > rHalf )
-    //   particleData.velocity.z = -particleData.velocity.z;
-
-     //for(var v = 0; v<planeResolution+1; v++){
-          //plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
-
-      // for(var j = planeResolution*2;i>0;i--){
-      //   plane.geometry.vertices[v+((planeResolution+1)*i)].z=plane.geometry.vertices[((planeResolution+1)-v)+((planeResolution+1)*(i-1))].z;
-      // }
-  //     plane.geometry.vertices[v].z = 0;
-  //     plane.geometry.vertices[v].z=Math.pow(analyser.getFrequencyData()[v]*.01,3);
-  //     plane.geometry.vertices[planeResolution-v].z+=Math.pow(analyser.getFrequencyData()[v]*.01,3);
-  //   }
-    //}
-    //console.log(analyser.getFrequencyData().length)
-    //particlePositions[i*3+1] =  -20+(analyser.getFrequencyData()[i%planeResolution]*.01);
     if ( effectController.limitConnections && particleData.numConnections >= effectController.maxConnections )
       continue;
 
@@ -621,10 +606,12 @@ function animateFloor(){
       }
     }
   }
-
+  for(var j = particleCount;j>planeResolution;j--){
+    particlePositions[(j-1)*3+1] = particlePositions[((j-1)*3+1)-(planeResolution*3)];
+  }
 
   linesMesh.geometry.setDrawRange( 0, numConnected * 2 );
- linesMesh.geometry.attributes.position.needsUpdate = true;
+  linesMesh.geometry.attributes.position.needsUpdate = true;
   linesMesh.geometry.attributes.color.needsUpdate = true;
 
   group.children[0].geometry.attributes.position.needsUpdate = true;
