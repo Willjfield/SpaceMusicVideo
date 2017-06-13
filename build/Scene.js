@@ -568,7 +568,7 @@ function buildFloor(){
 
 var floorForward = 0;
 function animateFloor(){
-  floorForward+=.0003;
+  //floorForward+=.0003;
   var vertexpos = 0;
   var colorpos = 0;
   var numConnected = 0;
@@ -587,9 +587,13 @@ function animateFloor(){
 
     particlePositions[z_index]+=floorForward
     if(i<planeResolution){
-      particlePositions[y_index] = -40+(analyser.getFrequencyData()[(i%planeResolution)]*.05);
+      
+       //particlePositions[y_index] += Math.pow(Math.sin(i%planeResolution/4),2)*10;
+       particlePositions[y_index] = Math.sin(i%planeResolution/2)*planeResolution
+       particlePositions[x_index] = Math.cos(i%planeResolution/2)*planeResolution
+       particlePositions[y_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05);
       particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);
-       particlePositions[y_index] += Math.pow(Math.sin(i%planeResolution/4),2)*10;
+      particlePositions[y_index] -=10
        //particlePositions[y_index] += (i%(planeResolution));
     }
 
@@ -642,6 +646,7 @@ function animateFloor(){
   }
   for(var j = particleCount;j>planeResolution;j--){
     particlePositions[(j-1)*3+1] = particlePositions[((j-1)*3+1)-(planeResolution*3)];
+    particlePositions[(j-1)*3] = particlePositions[((j-1)*3)-(planeResolution*3)];
   }
 
   linesMesh.geometry.setDrawRange( 0, numConnected * 2 );
