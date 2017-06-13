@@ -27,6 +27,8 @@ var floorControls = {
   bendY: 0
 }
 
+var firstLineAnimate = true;
+
 function onLoad() {
 
   // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
@@ -46,7 +48,8 @@ function onLoad() {
 
   controls = new THREE.VRControls(camera);
   controls.standing = true;
-  camera.position.y = controls.userHeight;
+  controls.userHeight = -30;
+  controls.update();
 
   // Apply VR stereo rendering to renderer.
   effect = new THREE.VREffect(renderer);
@@ -101,7 +104,7 @@ function onLoad() {
 
   });
   vrButton.on('show', function() {
-    document.getElementById('ui').style.display = 'inherit';
+    //document.getElementById('ui').style.display = 'inherit';
   });
   document.getElementById('vr-button').appendChild(vrButton.domElement);
   document.getElementById('vr-button').addEventListener('click', function(){
@@ -150,14 +153,15 @@ var frameNum = 0;
 function animate(timestamp) {
   if(sound.isPlaying){
     //console.log(sound.context.currentTime-startedSoundTime);
+    if(controls.userHeight < 0)
+      controls.userHeight += .02;
+    //controls.update();
   }
    uniforms.u_time.value += .01;
 
   frameNum++;
 
   uniforms.u_time.value += .01;
-  // plane.geometry.verticesNeedUpdate = true;
-  // plane.geometry.colorsNeedUpdate = true;
   
   skyMesh.material.needsUpdate = true; 
   if(frameNum%3 === 0){
@@ -239,6 +243,10 @@ function loadAudio(){
     sound.setBuffer( buffer );
     sound.setLoop(false);
     sound.setVolume(0.5);
+    document.getElementById('ui').style.display = 'block';
+    controls.userHeight = -30
+    controls.update();
+
   });
 
   analyser = new THREE.AudioAnalyser( sound, 32 );
@@ -362,7 +370,7 @@ function playAssets(){
     z:.7
   });
 
-  var interval=1750;
+  var interval=2000;
   var time = 1000;
   setTimeout(function(){
     animateModel('astronaut');
@@ -440,11 +448,11 @@ function playAssets(){
     animateModel('Cassini');
   },time);
 
-  time+=interval;
+  // time+=interval;
 
-  setTimeout(function(){
-    animateModel('Titan_Sub');
-  },time);
+  // setTimeout(function(){
+  //   animateModel('Titan_Sub');
+  // },time);
 
   time+=interval; 
 
@@ -463,8 +471,37 @@ function playAssets(){
     for(var p in particlesData){
       particlesData[p].velocity = new THREE.Vector3( -.5 + Math.random(), -.5 + Math.random(),  -.5 + Math.random() )
     }
-  }, 89000)
+  }, 88000);
   
+  setTimeout(function(){
+     TweenLite.to(floorControls, 10, { 
+       bendX: 0,
+       bendY: 0
+    });
+
+    for(var p in particlesData){
+      firstLineAnimate = false;
+      
+      var x_index = p*3;
+      var y_index = p*3+1;
+      var z_index = p*3+2;
+
+      var p_x = particlePositions[x_index];
+      var p_y = particlePositions[y_index];
+      var p_z = particlePositions[z_index];
+
+      var p_position = new THREE.Vector3( p_x, p_y, p_z );
+
+      var dir_to_middle = p_position.sub(new THREE.Vector3( 0, 0, -1000 ));
+      dir_to_middle.normalize();
+      dir_to_middle.multiplyScalar ( -1 );
+
+      particlesData[p].velocity.x = lerp( particlesData[p].velocity.x, dir_to_middle,.05);
+      particlesData[p].velocity.y = lerp( particlesData[p].velocity.y, dir_to_middle,.05);
+      particlesData[p].velocity.z = lerp( particlesData[p].velocity.z, dir_to_middle,.05);
+    }
+  }, 110000);
+  //104000
 }
 function animateModel(modelName){
   console.log('animating '+modelName)
@@ -528,7 +565,7 @@ function buildFloor(){
  pMaterial = new THREE.PointsMaterial( {
     color: 0xff0088,
     size: 2,
-   blending: THREE.AdditiveBlending,
+    blending: THREE.AdditiveBlending,
     transparent: true,
     sizeAttenuation: false
   } );
@@ -604,7 +641,7 @@ function animateFloor(){
     var z_index = i*3+2;
 
     particlePositions[z_index]+=floorForward
-    if(i<planeResolution){
+    if(i<planeResolution && firstLineAnimate){
       var planePosition_x = ((i%planeResolution)*10)-(planeResolution/2)*10;
       var planePosition_y = -30;
       particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
