@@ -160,7 +160,10 @@ function animate(timestamp) {
   // plane.geometry.colorsNeedUpdate = true;
   
   skyMesh.material.needsUpdate = true; 
-  animateFloor();
+  if(frameNum%3 === 0){
+    animateFloor();
+  }
+  
 
   var delta = Math.min(timestamp - lastRenderTime, 500);
   lastRenderTime = timestamp;
