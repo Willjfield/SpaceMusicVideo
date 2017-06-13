@@ -294,7 +294,7 @@ var models = {
   },
   LRO: {
     name: 'LRO',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .1, .1, .1 )
   },
   LEM: {
     name: 'LEM',
@@ -314,23 +314,23 @@ var models = {
   },
   Rosetta: {
     name: 'Rosetta',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .1, .1, .1 )
   },
   galileo: {
     name: 'galileo',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .001, .001, .001 )
   },
   Titan_Sub: {
     name: 'Titan_Sub',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .0025, .0025, .0025 )
   },
   Cassini: {
     name: 'Cassini',
-    scale: new THREE.Vector3(.05, .05, .05)
+    scale: new THREE.Vector3(.025, .025, .025)
   },
   voyager: {
     name: 'voyager',
-    scale: new THREE.Vector3( .05, .05, .05 )
+    scale: new THREE.Vector3( .1, .1, .1 )
   },
 }
 
@@ -355,67 +355,98 @@ function loadModels(){
 };
 
 function playAssets(){
+  var interval=1500;
+  var time = 1000;
   setTimeout(function(){
     animateModel('astronaut');
-  },100);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('EMU');
-  },10000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('STS');
-  },20000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('ISS');
-  },30000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('Hubble');
-  },40000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('LRO');
-  },50000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('LEM');
-  },60000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('Dawn');
-  },70000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('MGS_mapping');
-  },80000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('MESSENGER');
-  },90000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('Rosetta');
-  },100000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('galileo');
-  },110000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('Cassini');
-  },120000);
+  },time);
+
+  time+=interval;
 
   setTimeout(function(){
     animateModel('Titan_Sub');
-  },130000);
+  },time);
+
+  time+=interval; 
 
   setTimeout(function(){
     animateModel('voyager');
-  },140000);
+  },time);
 }
 function animateModel(modelName){
+  console.log('animating '+modelName)
   var _model = models[modelName].model;
   var targetScale = models[modelName].scale;
 
@@ -449,7 +480,7 @@ function animateModel(modelName){
 
   var particlesData = [];
   var maxParticleCount = 1000;
-  var particleCount = 500;
+  var particleCount = 1000;
   var r = 800;
   var rHalf = r / 2;
   var group = new THREE.Group();
@@ -458,7 +489,7 @@ function animateModel(modelName){
     showLines: true,
     minDistance: 11,
     limitConnections: false,
-    maxConnections: 200,
+    maxConnections: 2000,
     particleCount: 50
   };
   var linesMesh;
@@ -488,9 +519,9 @@ function buildFloor(){
 
     var x = ((i%planeResolution)*10)-(planeResolution/2)*10;
     var y = -30;
-    var z = (Math.floor(i/planeResolution)*10)-(planeResolution*2)*10;
+    var z = (Math.floor(i/planeResolution)*10)-(planeResolution*4)*10;
 
-    //z-= planeResolution/2;
+    //var z = planeResolution/2;
     //x-= planeResolution/2;
 
     particlePositions[ i * 3     ] = x;
@@ -535,7 +566,9 @@ function buildFloor(){
   return group;
 }
 
+var floorForward = 0;
 function animateFloor(){
+  floorForward+=.0003;
   var vertexpos = 0;
   var colorpos = 0;
   var numConnected = 0;
@@ -552,6 +585,7 @@ function animateFloor(){
     var y_index = i*3+1;
     var z_index = i*3+2;
 
+    particlePositions[z_index]+=floorForward
     if(i<planeResolution){
       particlePositions[y_index] = -40+(analyser.getFrequencyData()[(i%planeResolution)]*.05);
       particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);
@@ -574,12 +608,12 @@ function animateFloor(){
       if ( effectController.limitConnections && particleDataB.numConnections >= effectController.maxConnections )
         continue;
 
-      var dx = particlePositions[ i * 3     ] - particlePositions[ j * 3     ];
-      var dy = particlePositions[ i * 3 + 1 ] - particlePositions[ j * 3 + 1 ];
-      var dz = particlePositions[ i * 3 + 2 ] - particlePositions[ j * 3 + 2 ];
+      var dx = particlePositions[ x_index ] - particlePositions[ j * 3     ];
+      var dy = particlePositions[ y_index ] - particlePositions[ j * 3 + 1 ];
+      var dz = particlePositions[ z_index ] - particlePositions[ j * 3 + 2 ];
       var dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
 
-      if ( dist < effectController.minDistance ) {
+      if ( dist < effectController.minDistance*2 ) {
 
         particleData.numConnections++;
         particleDataB.numConnections++;
