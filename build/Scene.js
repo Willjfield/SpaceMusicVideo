@@ -474,7 +474,7 @@ function playAssets(){
   }, 88000);
   
   setTimeout(function(){
-     TweenLite.to(floorControls, 10, { 
+     TweenLite.to(floorControls, 1, { 
        bendX: 0,
        bendY: 0
     });
@@ -494,14 +494,14 @@ function playAssets(){
 
       var dir_to_middle = p_position.sub(new THREE.Vector3( 0, 0, -1000 ));
       dir_to_middle.normalize();
-      dir_to_middle.multiplyScalar ( -1 );
+      //dir_to_middle.multiplyScalar ( 1 );
 
-      particlesData[p].velocity.x = lerp( particlesData[p].velocity.x, dir_to_middle,.05);
-      particlesData[p].velocity.y = lerp( particlesData[p].velocity.y, dir_to_middle,.05);
-      particlesData[p].velocity.z = lerp( particlesData[p].velocity.z, dir_to_middle,.05);
+      particlesData[p].velocity.x = lerp( particlesData[p].velocity.x, -dir_to_middle.x, .001);
+      particlesData[p].velocity.y = lerp( particlesData[p].velocity.y, -dir_to_middle.y, .001);
+      particlesData[p].velocity.z = lerp( particlesData[p].velocity.z, -dir_to_middle.z, .001);
     }
-  }, 110000);
-  //104000
+  }, 90000);
+  //110000
 }
 function animateModel(modelName){
   console.log('animating '+modelName)
@@ -708,9 +708,12 @@ function animateFloor(){
       }
     }
   }
-  for(var j = particleCount;j>planeResolution;j--){
-    particlePositions[(j-1)*3+1] = particlePositions[((j-1)*3+1)-(planeResolution*3)];
-    particlePositions[(j-1)*3] = particlePositions[((j-1)*3)-(planeResolution*3)];
+
+  if(firstLineAnimate){
+    for(var j = particleCount;j>planeResolution;j--){
+      particlePositions[(j-1)*3+1] = particlePositions[((j-1)*3+1)-(planeResolution*3)];
+      particlePositions[(j-1)*3] = particlePositions[((j-1)*3)-(planeResolution*3)];
+    }
   }
 
   linesMesh.geometry.setDrawRange( 0, numConnected * 2 );
