@@ -22,6 +22,7 @@ var sound;
 var startedSoundTime = 0;
 var skyMesh;
 
+//Control Bending of the floor
 var floorControls = {
   bendX: 0,
   bendY: 0
@@ -46,9 +47,11 @@ function onLoad() {
   var aspect = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 10000);
 
+  //Init VR Controls at floor
   controls = new THREE.VRControls(camera);
   controls.standing = true;
   controls.userHeight = -30;
+  camera.position.set(0, controls.userHeight, 0);
   controls.update();
 
   // Apply VR stereo rendering to renderer.
@@ -60,10 +63,10 @@ function onLoad() {
   loader.load('assets/box.png', onTextureLoaded);
 
   // Create 3D objects.
-  
+  //Grab Shaders
   var vertex = document.getElementById('vertexShader').innerHTML;
   var fragment = document.getElementById('fragmentShader').innerHTML;
-  //console.log(fragment)
+  //Atmosphere (sky) uniforms:
    uniforms = {
         u_time: { type: "f", value: 1.0 },
         u_resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth,window.innerHeight) },
@@ -303,15 +306,15 @@ var models = {
   },
   Dawn: {
     name: 'Dawn',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .1, .1, .1 )
   },
   MGS_mapping: {
     name: 'MGS_mapping',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .1, .1, .1 )
   },
   MESSENGER: {
     name: 'MESSENGER',
-    scale: new THREE.Vector3( 1, 1, 1 )
+    scale: new THREE.Vector3( .1, .1, .1 )
   },
   Rosetta: {
     name: 'Rosetta',
@@ -356,13 +359,10 @@ function loadModels(){
 };
 
 function playAssets(){
-  // if( uniforms.u_atmosphere.value>0){
-  //   uniforms.u_atmosphere.value -= .01;
-  // }
 
   TweenLite.to(uniforms.u_atmosphere, 60, { 
-        value: -.8,
-    });
+      value: -.5,
+  });
 
   TweenLite.to(uniforms.u_tint.value, 30,{
     x:.4,
@@ -448,8 +448,8 @@ function playAssets(){
     animateModel('Cassini');
   },time);
 
+  //Titan Sub, Don't use?
   // time+=interval;
-
   // setTimeout(function(){
   //   animateModel('Titan_Sub');
   // },time);
@@ -466,6 +466,13 @@ function playAssets(){
         bendY: 1
     });
   },53000);
+
+  setTimeout(function(){
+     TweenLite.to(floorControls, 3, { 
+       bendX: Math.sin(floorControls.bendY),
+       bendY: Math.cos(floorControls.bendX)
+    });
+   },72000);
 
   setTimeout(function(){
     for(var p in particlesData){
@@ -500,7 +507,7 @@ function playAssets(){
       particlesData[p].velocity.y = lerp( particlesData[p].velocity.y, -dir_to_middle.y, .001);
       particlesData[p].velocity.z = lerp( particlesData[p].velocity.z, -dir_to_middle.z, .001);
     }
-  }, 90000);
+  }, 114000);
   //110000
 }
 function animateModel(modelName){
@@ -576,7 +583,7 @@ function buildFloor(){
   for ( var i = 0; i < maxParticleCount; i++ ) {
 
     var x = ((i%planeResolution)*10)-(planeResolution/2)*10;
-    var y = -30;
+    var y = -40;
     var z = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
 
     particlePositions[ i * 3     ] = x;
@@ -659,6 +666,8 @@ function animateFloor(){
       particlePositions[z_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05)*floorControls.bendX;
 
       particlePositions[y_index] -=10
+
+      //console.log(particlePositions[y_index]);
     }
 
     
