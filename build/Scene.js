@@ -25,7 +25,9 @@ var skyMesh;
 //Control Bending of the floor
 var floorControls = {
   bendX: 0,
-  bendY: 0
+  bendY: 0,
+  stage: 0,
+
 }
 
 var firstLineAnimate = true;
@@ -461,6 +463,7 @@ function playAssets(){
   },time);
 
   setTimeout(function(){
+    floorControls.stage = 1;
     TweenLite.to(floorControls, 3, { 
         bendX: 1,
         bendY: 1
@@ -468,9 +471,13 @@ function playAssets(){
   },53000);
 
   setTimeout(function(){
+    floorControls.stage = 2;
+    floorControls.bendX = 0;
+    floorControls.bendY = 0;
+
      TweenLite.to(floorControls, 3, { 
-       bendX: Math.sin(floorControls.bendY),
-       bendY: Math.cos(floorControls.bendX)
+       bendX: 1,
+       bendY: 1
     });
    },72000);
 
@@ -652,12 +659,28 @@ function animateFloor(){
       var planePosition_x = ((i%planeResolution)*10)-(planeResolution/2)*10;
       var planePosition_y = -30;
       particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
+      particlePositions[y_index] = planePosition_y;
+      particlePositions[x_index] = planePosition_x;
 
-      var tubePosition_y = Math.sin(i%planeResolution/2)*planeResolution
-      var tubePosition_x = Math.cos(i%planeResolution/2)*planeResolution
+      var tubePosition_y = Math.sin(i%planeResolution/2)*planeResolution;
+      var tubePosition_x = Math.cos(i%planeResolution/2)*planeResolution;
 
-      particlePositions[y_index] = lerp(planePosition_y,tubePosition_y,floorControls.bendY);
-      particlePositions[x_index] = lerp(planePosition_x,tubePosition_x,floorControls.bendX);
+      var tubePosition2_y = Math.cos(i%planeResolution/2)*planeResolution;
+      var tubePosition2_x = Math.sin(i%planeResolution/2)*planeResolution;
+
+      //var 
+      switch(floorControls.stage){
+        case 1:
+          particlePositions[y_index] = lerp(planePosition_y,tubePosition_y,floorControls.bendY);
+          particlePositions[x_index] = lerp(planePosition_x,tubePosition_x,floorControls.bendX);
+        break;
+        case 2:
+          particlePositions[y_index] = lerp(tubePosition_y,tubePosition2_y,floorControls.bendY);
+          particlePositions[x_index] = lerp(tubePosition_y,tubePosition2_x,floorControls.bendX);
+        break;
+        default:
+        break;
+      }
 
       particlePositions[y_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05);
       particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);

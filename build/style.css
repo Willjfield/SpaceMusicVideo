@@ -49,3 +49,17 @@ a#magic-window {
   font-family: Elite;
   text-shadow: 0 0 16px #ff66ff;
 }
+
+.credit{
+  font-family: sans-serif;
+  display: block;
+
+}
+
+.credit-container{
+  width: 407px;
+    margin: 0 auto;
+    font-weight: lighter;
+    margin-top: 10%;
+    margin-bottom: -14%;
+}
