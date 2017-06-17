@@ -296,7 +296,7 @@ var models = {
   },
   Hubble: {
     name: 'Hubble',
-    scale: new THREE.Vector3( .05, .05, .05 )
+    scale: new THREE.Vector3( .01, .01, .01 )
   },
   LRO: {
     name: 'LRO',
@@ -347,7 +347,7 @@ function loadModels(){
               //object.name=load_obj; 
               object.traverse( function ( child ) {
                 if ( child instanceof THREE.Mesh ) {
-                  child.material = new THREE.MeshBasicMaterial( {color:new THREE.Color("hsl("+Math.random()*90+", 100%, 50%)"), wireframe:true} );
+                  child.material = new THREE.MeshBasicMaterial( {color:new THREE.Color("hsl("+Math.random()*90+", 100%, 50%)"), wireframe:true, transparent:true, opacity:0} );
                 }
               });        
               scene.add( object );  
@@ -372,7 +372,7 @@ function playAssets(){
     z:.7
   });
 
-  var interval=2000;
+  var interval=2250;
   var time = 1000;
   setTimeout(function(){
     animateModel('astronaut');
@@ -482,6 +482,7 @@ function playAssets(){
    },72000);
 
   setTimeout(function(){
+    floorControls.stage = 3;
     for(var p in particlesData){
       particlesData[p].velocity = new THREE.Vector3( -.5 + Math.random(), -.5 + Math.random(),  -.5 + Math.random() )
     }
@@ -523,9 +524,9 @@ function animateModel(modelName){
   var targetScale = models[modelName].scale;
 
   _model.visible = true;
-  _model.position.set( 10*((Math.round(Math.random())*2)-1), 10*((Math.round(Math.random())*2)), -200 );
+  _model.position.set( 10*((Math.round(Math.random())*2)-1), 10*((Math.round(Math.random())*2)), -100 );
   _model.rotation.set( 0, 0, 0 );
-  _model.scale.set( 0, 0, 0 );
+  _model.scale.set( targetScale.x, targetScale.y, targetScale.z);
   TweenLite.to(_model.position, 30, { 
       z: 100,
       y: 10*((Math.round(Math.random())*2)),
@@ -533,6 +534,7 @@ function animateModel(modelName){
       ease:Linear.easeNone,
       onComplete: function(){
         _model.visible = false;
+        scene.remove(_model);
        return;
       }
   });
@@ -542,12 +544,16 @@ function animateModel(modelName){
       x: Math.random()*4,
       ease:Linear.easeNone
   });
-  TweenLite.to(_model.scale, 30, { 
-      z: targetScale.z,
-      y: targetScale.y,
-      x: targetScale.x,
-      ease:Linear.easeNone
+  //scene.children[8].children[0].material.opacity
+  TweenLite.to(_model.children[0].material,5, {
+    opacity: .1
   });
+  // TweenLite.to(_model.scale, 30, { 
+  //     z: targetScale.z,
+  //     y: targetScale.y,
+  //     x: targetScale.x,
+  //     ease:Linear.easeNone
+  // });
 }
 
   var particlesData = [];
@@ -638,7 +644,7 @@ function buildFloor(){
 var floorForward = 0;
 function animateFloor(){
   floorForward++;
-  if(floorForward%10===0){
+  if(floorForward%10===0 && floorControls.stage < 3){
     scene.children[1].position.z-=10;
   }
 
@@ -681,6 +687,10 @@ function animateFloor(){
         case 2:
           particlePositions[y_index] = lerp(tubePosition_y,tubePosition2_y,floorControls.bendY);
           particlePositions[x_index] = lerp(tubePosition_y,tubePosition2_x,floorControls.bendX);
+        break;
+        case 3:
+          particlePositions[y_index] = lerp(planePosition_y,tubePosition_y,floorControls.bendY);
+          particlePositions[x_index] = lerp(planePosition_x,tubePosition_x,floorControls.bendX);
         break;
         default:
         break;
