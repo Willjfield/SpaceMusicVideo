@@ -45,7 +45,7 @@ a#magic-window {
   color: #ff66ff;
   font-weight: bold;
   letter-spacing: -15px;
-  font-size: 1000%;
+  font-size: 16vw;
   font-family: Elite;
   text-shadow: 0 0 16px #ff66ff;
 }
@@ -53,11 +53,11 @@ a#magic-window {
 .credit{
   font-family: sans-serif;
   display: block;
-
+  font-size: 2vw;
 }
 
 .credit-container{
-  width: 407px;
+  width: 37vw;
     margin: 0 auto;
     font-weight: lighter;
     margin-top: 10%;

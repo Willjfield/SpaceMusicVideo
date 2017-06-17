@@ -600,7 +600,7 @@ function buildFloor(){
     // add it to the geometry
     particlesData.push( {
       //velocity: new THREE.Vector3( -1 + Math.random() * 2, -1 + Math.random() * 2,  -1 + Math.random() * 2 ),
-      velocity: new THREE.Vector3( 0, 0, 0 ),
+      velocity: new THREE.Vector3( 0, 0, 1 ),
       numConnections: 0
     } );
   }
@@ -637,7 +637,11 @@ function buildFloor(){
 
 var floorForward = 0;
 function animateFloor(){
-  //floorForward+=.0003;
+  floorForward++;
+  if(floorForward%10===0){
+    scene.children[1].position.z-=10;
+  }
+
   var vertexpos = 0;
   var colorpos = 0;
   var numConnected = 0;
@@ -654,11 +658,11 @@ function animateFloor(){
     var y_index = i*3+1;
     var z_index = i*3+2;
 
-    particlePositions[z_index]+=floorForward
+    //particlePositions[z_index]+=floorForward
     if(i<planeResolution && firstLineAnimate){
       var planePosition_x = ((i%planeResolution)*10)-(planeResolution/2)*10;
       var planePosition_y = -30;
-      particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
+      //particlePositions[z_index] = (Math.floor(i/planeResolution)*10)-(planeResolution)*10;
       particlePositions[y_index] = planePosition_y;
       particlePositions[x_index] = planePosition_x;
 
@@ -685,8 +689,8 @@ function animateFloor(){
       particlePositions[y_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05);
       particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);
 
-      particlePositions[z_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05)*floorControls.bendX;
-      particlePositions[z_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05)*floorControls.bendX;
+      //particlePositions[z_index] += (analyser.getFrequencyData()[(i%planeResolution)]*.05)*floorControls.bendX;
+      //particlePositions[z_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05)*floorControls.bendX;
 
       particlePositions[y_index] -=10
 
