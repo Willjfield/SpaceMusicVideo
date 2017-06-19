@@ -10,8 +10,8 @@ function playAssets(){
     z:.7
   });
 
-  var interval=2250;
-  var time = 1000;
+  var interval=2100;
+  var time = 5000;
   setTimeout(function(){
     animateModel('astronaut');
   },time);
@@ -101,14 +101,17 @@ function playAssets(){
   },time);
 
   setTimeout(function(){
+
     floorControls.stage = 1;
     TweenLite.to(floorControls, 3, { 
         bendX: 1,
         bendY: 1
     });
-  },53000);
+    console.log(floorControls.stage);
+  },45000);
 
   setTimeout(function(){
+
     floorControls.stage = 2;
     floorControls.bendX = 0;
     floorControls.bendY = 0;
@@ -117,48 +120,65 @@ function playAssets(){
        bendX: 1,
        bendY: 1
     });
-   },72000);
+     console.log(floorControls.stage);
+   },50000);
+
+  setTimeout(function(){
+    floorControls.stage = 2;
+    floorControls.bendX = 0;
+    floorControls.bendY = 0;
+    TweenLite.to(floorControls, 3, { 
+        bendX: 1,
+        bendY: 1
+    });
+    console.log(floorControls.stage);
+  },54000);
+
+  setTimeout(function(){
+    floorControls.stage = 2;
+    floorControls.bendX = 0;
+    floorControls.bendY = 0;
+     TweenLite.to(floorControls, 3, { 
+       bendX: 1,
+       bendY: 1
+    });
+     console.log(floorControls.stage);
+   },58000);
 
   setTimeout(function(){
     floorControls.stage = 3;
     for(var p in particlesData){
       particlesData[p].velocity = new THREE.Vector3( -.5 + Math.random(), -.5 + Math.random(),  -.5 + Math.random() )
     }
-  }, 88000);
+    console.log(floorControls.stage);
+  }, 62000);
   
   setTimeout(function(){
-     TweenLite.to(floorControls, 1, { 
-       bendX: 0,
-       bendY: 0
-    });
-
-     firstLineAnimate = false;
-     floorControls.stage = 3;
-
-
     for(var p in particlesData){
-      
-      
-      var x_index = p*3;
-      var y_index = p*3+1;
-      var z_index = p*3+2;
-
-      var p_x = particlePositions[x_index];
-      var p_y = particlePositions[y_index];
-      var p_z = particlePositions[z_index];
-
-      var p_position = new THREE.Vector3( p_x, p_y, p_z );
-
-      var dir_to_middle = p_position.sub(new THREE.Vector3( 0, 0, 0 ));
-      dir_to_middle.normalize();
-      console.log(dir_to_middle)
-      dir_to_middle.multiplyScalar ( -1 );
-      particlesData[p].velocity.z = 0;
-      particlesData[p].velocity.x = dir_to_middle.x//lerp( particlesData[p].velocity.x, -dir_to_middle.x, .01);
-      particlesData[p].velocity.y = dir_to_middle.y//lerp( particlesData[p].velocity.y, -dir_to_middle.y, .01);
-      particlesData[p].velocity.z = dir_to_middle.z//lerp( particlesData[p].velocity.z, -dir_to_middle.z, .01);
+      particlesData[p].velocity = new THREE.Vector3();
     }
+    floorControls.stage = 4;
+    floorControls.bendX = 0;
+    floorControls.bendY = 0;
+     firstLineAnimate = false;
+     console.log(floorControls.stage);
 
+  }, 66000);
+
+  setTimeout(function(){
+
+     floorControls.stage = 5;
+     console.log(floorControls.stage);
+  }, 72000);
+  setTimeout(function(){
+
+     floorControls.stage = 6;
+     console.log(floorControls.stage);
+  }, 110000);
+  setTimeout(function(){
+
+     floorControls.stage = 7;
+     console.log(floorControls.stage);
   }, 114000);
 }
 
@@ -257,6 +277,31 @@ function animateFloor(){
       particlePositions[y_index] += (analyser.getFrequencyData()[planeResolution-(i%planeResolution)]*.05);
 
       particlePositions[y_index] -=10
+    }
+    switch(floorControls.stage){
+      case 4:
+        var p_position = new THREE.Vector3( particlePositions[x_index], particlePositions[y_index], particlePositions[z_index] );
+        var p_target = new THREE.Vector3(Math.cos(i*frameNum*.001),Math.sin(i*frameNum*.001),Math.tan(i*frameNum*.001)+1*.5 );
+        p_target.multiplyScalar(3000);
+        if( effectController.minDistance<16){
+          effectController.minDistance += .1
+        }
+        particleData.velocity = velocityToTarget(p_position,p_target,p_target.distanceTo(p_position)*.0001);
+      break;
+      case 5:
+        var p_position = new THREE.Vector3( particlePositions[x_index], particlePositions[y_index], particlePositions[z_index] );
+        var p_target = new THREE.Vector3(Math.cos(i*frameNum*.001),Math.sin(i*frameNum*.001),Math.tan(i*frameNum*.001) );
+        p_target.multiplyScalar(2000);
+        particleData.velocity = velocityToTarget(p_position,p_target,2);
+      break;
+      case 6:
+        var p_position = new THREE.Vector3( particlePositions[x_index], particlePositions[y_index], particlePositions[z_index] );
+        particleData.velocity = velocityToTarget(p_position,floorControls.particleTarget,2);
+      break;
+      case 7:
+        var p_position = new THREE.Vector3( particlePositions[x_index], particlePositions[y_index], particlePositions[z_index] );
+        particleData.velocity = velocityToTarget(p_position,floorControls.particleTarget,-5);
+      break;
     }
 
     particlePositions[ i * 3     ] += particleData.velocity.x;

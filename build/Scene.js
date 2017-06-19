@@ -50,7 +50,7 @@ function onLoad() {
                 side: THREE.DoubleSide
         });
   skyMaterial.needsUpdate = true;
-  var skyGeometry = new THREE.IcosahedronBufferGeometry(1000, 3)
+  var skyGeometry = new THREE.IcosahedronBufferGeometry(1000, 0)
   skyGeometry.phiLength = Math.PI/2;
   skyMesh = new THREE.Mesh( skyGeometry, skyMaterial);
   scene.add(skyMesh);
@@ -85,7 +85,12 @@ function animate(timestamp) {
    uniforms.u_time.value += .01;
 
   frameNum++;
+  
+  //floorControls.particleTarget.x += (noise.perlin2(floorControls.particleTarget.x, frameNum*.001))*50;
+  //floorControls.particleTarget.y += (noise.perlin2(floorControls.particleTarget.y, 100+frameNum*.001))*50;
+  //floorControls.particleTarget.z += (noise.perlin2(floorControls.particleTarget.z, 200+frameNum*.001))*50;
 
+  //console.log(noise.perlin2(1, 10))
   uniforms.u_time.value += .01;
   
   skyMesh.material.needsUpdate = true; 
@@ -131,6 +136,12 @@ function onResize(e) {
 //         sound.stop();
 //     }
 // }
+function velocityToTarget(pos,target,speed){
+      var dir_to_target = pos.sub(target);
+      dir_to_target.normalize();
+      dir_to_target.multiplyScalar ( -1*speed);
+      return dir_to_target
+}
 
 function lerp(start, end, percent)
 {

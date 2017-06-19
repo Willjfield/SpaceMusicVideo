@@ -27,6 +27,7 @@ var floorControls = {
   bendX: 0,
   bendY: 0,
   stage: 0,
+  particleTarget : new THREE.Vector3( 0, 0, 0 )
 }
 
 var firstLineAnimate = true;
@@ -95,8 +96,8 @@ var models = {
 }
 
 var particlesData = [];
-var maxParticleCount = 1000;
-var particleCount = 500;
+var maxParticleCount = 200;
+var particleCount = 200;
 var r = 800;
 var rHalf = r / 2;
 var group = new THREE.Group();
@@ -104,10 +105,10 @@ var group = new THREE.Group();
 var effectController = {
 	showDots: true,
 	showLines: true,
-	minDistance: 11,
+	minDistance: 12,
 	limitConnections: false,
 	maxConnections: 2000,
-	particleCount: 50
+	particleCount: 25
 };
 
 var linesMesh;
