@@ -58,7 +58,7 @@ function onLoad() {
   window.addEventListener('resize', onResize, true);
   window.addEventListener('vrdisplaypresentchange', function(){
     onResize();
-    if(!sound.isPlaying && vrButton.isPresenting()){
+    if(!sound.isPlaying){
         sound.play();
         playAssets();
         startedSoundTime = sound.context.currentTime;
