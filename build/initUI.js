@@ -8,7 +8,7 @@ function initUI(){
   vrButton = new webvrui.EnterVRButton(renderer.domElement, uiOptions);
   vrButton.on('exit', function() {
     camera.quaternion.set(0, 0, 0, 1);
-    camera.position.set(0, controls.userHeight, 0);
+    //camera.position.set(0, controls.userHeight, 0);
   });
   vrButton.on('hide', function() {
     document.getElementById('ui').style.display = 'none';

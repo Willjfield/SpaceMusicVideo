@@ -14,8 +14,8 @@ function loadAudio(){
     sound.setLoop(false);
     sound.setVolume(0.5);
     document.getElementById('ui').style.display = 'block';
-    controls.userHeight = -30
-    controls.update();
+    //controls.userHeight = -30
+    //controls.update();
 
   });
 

@@ -80,7 +80,11 @@ function animate(timestamp) {
     //console.log(sound.context.currentTime-startedSoundTime);
     if(controls.userHeight < 0)
       controls.userHeight += .02;
-    //controls.update();
+      //camera.position.set(0, controls.userHeight, 0);
+      camera.position.y =  controls.userHeight
+      //console.log(controls.userHeight)
+      //console.log(camera.position.y)
+      //controls.update();
   }
    uniforms.u_time.value += .01;
 
@@ -105,6 +109,8 @@ function animate(timestamp) {
   // Only update controls if we're presenting.
   if (vrButton.isPresenting()) {
     controls.update();
+    camera.position.y = controls.userHeight;
+    
     analyser.getFrequencyData();
   }
   // Render the scene.
