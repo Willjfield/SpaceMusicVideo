@@ -79,9 +79,9 @@ function animate(timestamp) {
   if(sound.isPlaying){
     //console.log(sound.context.currentTime-startedSoundTime);
     if(controls.userHeight < 0)
-      controls.userHeight += .02;
+      controls.userHeight -= .005*controls.userHeight;
       //camera.position.set(0, controls.userHeight, 0);
-      camera.position.y =  controls.userHeight
+      camera.position.y = controls.userHeight;
       //console.log(controls.userHeight)
       //console.log(camera.position.y)
       //controls.update();

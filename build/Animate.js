@@ -10,8 +10,9 @@ function playAssets(){
     z:.7
   });
 
-  var interval=2100;
+  var interval = 1100;
   var time = 5000;
+
   setTimeout(function(){
     animateModel('astronaut');
   },time);
@@ -101,14 +102,13 @@ function playAssets(){
   },time);
 
   setTimeout(function(){
-
     floorControls.stage = 1;
     TweenLite.to(floorControls, 3, { 
         bendX: 1,
         bendY: 1
     });
     console.log(floorControls.stage);
-  },45000);
+  },34000);
 
   setTimeout(function(){
 
@@ -121,7 +121,7 @@ function playAssets(){
        bendY: 1
     });
      console.log(floorControls.stage);
-   },50000);
+   },43000);
 
   setTimeout(function(){
     floorControls.stage = 2;
@@ -132,7 +132,7 @@ function playAssets(){
         bendY: 1
     });
     console.log(floorControls.stage);
-  },54000);
+  },46000);
 
   setTimeout(function(){
     floorControls.stage = 2;
@@ -143,7 +143,7 @@ function playAssets(){
        bendY: 1
     });
      console.log(floorControls.stage);
-   },58000);
+   },49000);
 
   setTimeout(function(){
     floorControls.stage = 3;
@@ -151,7 +151,7 @@ function playAssets(){
       particlesData[p].velocity = new THREE.Vector3( -.5 + Math.random(), -.5 + Math.random(),  -.5 + Math.random() )
     }
     console.log(floorControls.stage);
-  }, 62000);
+  }, 52000);
   
   setTimeout(function(){
     for(var p in particlesData){
@@ -163,23 +163,23 @@ function playAssets(){
      firstLineAnimate = false;
      console.log(floorControls.stage);
 
-  }, 66000);
+  }, 56000);
 
   setTimeout(function(){
 
      floorControls.stage = 5;
      console.log(floorControls.stage);
-  }, 72000);
-  setTimeout(function(){
+  }, 60000);
 
+  setTimeout(function(){
      floorControls.stage = 6;
      console.log(floorControls.stage);
-  }, 110000);
-  setTimeout(function(){
+  }, 68000);
 
+  setTimeout(function(){
      floorControls.stage = 7;
      console.log(floorControls.stage);
-  }, 114000);
+  }, 70000);
 }
 
 function animateModel(modelName){
@@ -296,7 +296,7 @@ function animateFloor(){
       break;
       case 6:
         var p_position = new THREE.Vector3( particlePositions[x_index], particlePositions[y_index], particlePositions[z_index] );
-        particleData.velocity = velocityToTarget(p_position,floorControls.particleTarget,2);
+        particleData.velocity = velocityToTarget(p_position,floorControls.particleTarget,p_position.length()*.05);
       break;
       case 7:
         var p_position = new THREE.Vector3( particlePositions[x_index], particlePositions[y_index], particlePositions[z_index] );
