@@ -188,10 +188,15 @@ function playAssets(){
         createSolarSystem();
 
         let solarSystem = scene.getObjectByName( "Solar System" );
-        solarSystem.position.z = -100;
+        solarSystem.position.z = -50;
         TweenLite.to(solarSystem.position, 30, {
-          z: 200,
+          z: 100,
           ease:Linear.easeNone,
+          onComplete:destroySolarSystem
+        });
+
+         TweenLite.to(solarSystem.rotation, 30, {
+          z: 3.1415,
           onComplete:destroySolarSystem
         });
 
