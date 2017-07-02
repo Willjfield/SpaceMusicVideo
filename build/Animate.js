@@ -1,5 +1,7 @@
 function playAssets(){
 
+  
+
   TweenLite.to(uniforms.u_atmosphere, 60, { 
       value: -.5,
   });
@@ -27,6 +29,7 @@ function playAssets(){
 
   setTimeout(function(){
     animateModel('STS');
+
   },time);
 
   time+=interval;
@@ -39,6 +42,7 @@ function playAssets(){
 
   setTimeout(function(){
     animateModel('Hubble');
+
   },time);
 
   time+=interval;
@@ -87,6 +91,7 @@ function playAssets(){
 
   setTimeout(function(){
     animateModel('Cassini');
+    
   },time);
 
   //Titan Sub, Don't use?
@@ -178,7 +183,23 @@ function playAssets(){
 
   setTimeout(function(){
      floorControls.stage = 7;
+     setTimeout(function(){
+        scene.remove(scene.getObjectByName( "Floor" ));
+        createSolarSystem();
+
+        let solarSystem = scene.getObjectByName( "Solar System" );
+        solarSystem.position.z = -100;
+        TweenLite.to(solarSystem.position, 30, {
+          z: 200,
+          ease:Linear.easeNone,
+          onComplete:destroySolarSystem
+        });
+
+     },2000)
      console.log(floorControls.stage);
+
+    
+
   }, 70000);
 }
 

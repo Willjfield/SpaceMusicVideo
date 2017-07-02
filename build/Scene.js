@@ -71,6 +71,7 @@ function onLoad() {
   loadModels();
 
   var floorGroup = buildFloor();
+  floorGroup.name = "Floor";
   scene.add(floorGroup);
 }
 
